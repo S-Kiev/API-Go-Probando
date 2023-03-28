@@ -3,6 +3,8 @@ package middleware
 import (
 	"log"
 	"net/http"
+
+	"github.com/S-Kiev/API-Go-Probando/authorization"
 )
 
 func Log(f func(http.ResponseWriter, *http.Request)) func(http.ResponseWriter, *http.Request) {
@@ -16,7 +18,7 @@ func Authentication(f func(http.ResponseWriter, *http.Request)) func(http.Respon
 	return func(w http.ResponseWriter, r *http.Request) {
 		token := r.Header.Get("Authorization")
 		_, err := authorization.ValidateToken(token)
-		if token != "un-token-muy-seguro" {
+		if err != nil {
 			forbidden(w, r)
 			return
 		}
