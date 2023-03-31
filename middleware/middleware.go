@@ -1,33 +1,21 @@
 package middleware
 
 import (
-	"log"
+	//"log"
 	"net/http"
 
 	"github.com/S-Kiev/API-Go-Probando/authorization"
+	"github.com/labstack/echo"
 )
 
-func Log(f func(http.ResponseWriter, *http.Request)) func(http.ResponseWriter, *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("peticion %q, método: %q", r.URL.Path, r.Method)
-		f(w, r)
-	}
-}
-
-func Authentication(f func(http.ResponseWriter, *http.Request)) func(http.ResponseWriter, *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		token := r.Header.Get("Authorization")
+func Authentication(f echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		token := c.Request().Header.Get("Authorization")
 		_, err := authorization.ValidateToken(token)
 		if err != nil {
-			forbidden(w, r)
-			return
+			return c.JSON(http.StatusForbidden, map[string]string{"error": "no permitido"})
 		}
-		f(w, r)
-	}
-}
+		return f(c)
 
-func forbidden(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusForbidden)
-	w.Write([]byte("No tiene autorización"))
+	}
 }

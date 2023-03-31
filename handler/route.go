@@ -1,24 +1,28 @@
 package handler
 
 import (
-	"net/http"
+	//"net/http"
 
 	"github.com/S-Kiev/API-Go-Probando/middleware"
+	"github.com/labstack/echo"
 )
 
 // RoutePerson .
-func RoutePersona(mux *http.ServeMux, storage Storage) {
-	h := newPersona(storage)
 
-	mux.HandleFunc("/v1/personas/create", middleware.Log(middleware.Authentication(h.create)))
-	mux.HandleFunc("/v1/personas/update", h.update)
-	mux.HandleFunc("/v1/personas/get-all", middleware.Log(h.getAll))
-	mux.HandleFunc("/v1/personas/delete", middleware.Log(h.delete))
-	mux.HandleFunc("/v1/persons/get-by-id", middleware.Log(h.getByID))
+func RoutePersona(e *echo.Echo, storage Storage) {
+	h := newPersona(storage)
+	person := e.Group("v1/personas")
+	person.Use(middleware.Authentication)
+
+	person.POST("", h.create)
+	person.PUT("/:id", h.update)
+	person.GET("", h.getAll)
+	person.DELETE("/:id", h.delete)
+	person.GET("/:id", h.getByID)
 }
 
-func RouteLogin(mux *http.ServeMux, storage Storage) {
+func RouteLogin(e *echo.Echo, storage Storage) {
 	h := newLogin(storage)
 
-	mux.HandleFunc("/v1/login", h.login)
+	e.POST("/v1/login", h.login)
 }

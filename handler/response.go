@@ -1,9 +1,7 @@
 package handler
 
-import (
-	"encoding/json"
-	"net/http"
-)
+//"encoding/json"
+//"net/http"
 
 const (
 	Error   = "error"
@@ -21,14 +19,5 @@ func newResponse(messageType string, message string, data interface{}) response 
 		messageType,
 		message,
 		data,
-	}
-}
-
-func responseJSON(w http.ResponseWriter, statusCode int, resp response) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(statusCode)
-	err := json.NewEncoder(w).Encode(&resp)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
